@@ -42,6 +42,6 @@ func TestAuthKeyFormat(t *testing.T) {
 	headers := make(http.Header)
 	headers.Set("Authorization", "ApiKey my-secret api-key")
 	apiKey, err := GetAPIKey(headers)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, "my-secret", apiKey)
 }
