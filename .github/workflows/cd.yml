@@ -27,6 +27,12 @@ jobs:
           ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
           ACTIONS_ID_TOKEN_REQUEST_URL: ${{ secrets.ACTION }}
 
+      - name: Decode and Inspect OIDC Token
+        run: |
+          echo "${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}" | base64 -d | jq
+        env:
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ steps.auth.outputs.credentials }}
+      
       - name: Authenticate with GCP
         id: auth
         uses: google-github-actions/auth@v2
