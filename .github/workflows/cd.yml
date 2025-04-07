@@ -5,19 +5,37 @@ on:
     branches: [main]
 
 jobs:
-  deploy:
-    name: Deploy
+  deploy_and_gcp:
+    name: Build and Set Up GCP with Authentication
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
+    # Add permissions for OIDC authentication
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-            
-      - name: Set up Go
-        uses: actions/setup-go@v5
+
+      - name: Authenticate with GCP
+        id: auth
+        uses: google-github-actions/auth@v2
         with:
-          go-version: "1.23.0"
-            
-      - name: Build app
-        run: ./scripts/buildprod.sh
+          workload_identity_provider: 'projects/414671867523/locations/global/workloadIdentityPools/github-pool-notely-456018/providers/github-provider-notely-456018'
+          service_account: 'cloud-run-deployer@notely-456018.iam.gserviceaccount.com'
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          version: '>= 363.0.0'
+
+      - name: Verify gcloud
+        run: gcloud info
+      
+      - name: Build Docker image
+        run: docker build -t arkkis27/notely:latest .
+      
+      - name: Push image to Google Artifact Registry
+        run: gcloud builds submit --tag europe-north1-docker.pkg.dev/notely-456018/notely-ar-repo/notely:latest .
