@@ -18,6 +18,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
+      - name: Debug the GitHub OIDC token
+        run: |
+          echo "TOKEN URL: $ACTIONS_ID_TOKEN_REQUEST_URL"
+          echo "TOKEN: $ACTIONS_ID_TOKEN_REQUEST_TOKEN"
+        env:
+          ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ secrets.ACTIONS_ID_TOKEN_REQUEST_TOKEN }}
+          ACTIONS_ID_TOKEN_REQUEST_URL: ${{ secrets.ACTION }}
 
       - name: Authenticate with GCP
         id: auth
@@ -39,3 +47,5 @@ jobs:
       
       - name: Push image to Google Artifact Registry
         run: gcloud builds submit --tag europe-north1-docker.pkg.dev/notely-456018/notely-ar-repo/notely:latest .
+      
+      
